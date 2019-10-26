@@ -18,33 +18,28 @@ public class NewServlet extends javax.servlet.http.HttpServlet {
         studentDAO = new StudentDAOImpl();
     }
 
-    protected void doPost(javax.servlet.http.HttpServletRequest request, javax.servlet.http.HttpServletResponse response) throws javax.servlet.ServletException, IOException {
-        //String name = request.getParameter("name");
-        Student s = new Student();
-        //s.setName(name);
+	protected void doPost(javax.servlet.http.HttpServletRequest request, javax.servlet.http.HttpServletResponse response) throws javax.servlet.ServletException, IOException {
+		
+		Student s = new Student();
+        String name = request.getParameter("name");
+        s.setName(name);
 
-        for (Part p : request.getParts()) {
-            if ("name".equals(p.getName())) {
-                BufferedReader br = new BufferedReader(new InputStreamReader(p.getInputStream()));
-                s.setName(br.readLine());
-            } else if ("photo".equals(p.getName())) {
-                String localdir = "uploads";
-                String pathDir = getServletContext().getRealPath("") + File.separator + localdir;
-                File dir = new File(pathDir);
-                if (!dir.exists()) {
-                    dir.mkdir();
-                }
-                String[] filename_data = p.getSubmittedFileName().split("\\.");
-                String filename = Math.random() + "." + filename_data[filename_data.length - 1];
-                String fullpath = pathDir + File.separator + filename;
-                p.write(fullpath);
-                s.setPhotoPath("/" + localdir + "/" + filename);
-            }
+        Part p = request.getPart("photo");
+        String localdir = "uploads";
+        String pathDir = getServletContext().getRealPath("") + File.separator + localdir;
+        File dir = new File(pathDir);
+        if (!dir.exists()) {
+            dir.mkdir();
         }
+        String[] filename_data = p.getSubmittedFileName().split("\\.");
+        String filename = Math.random() + "." + filename_data[filename_data.length - 1];
+        String fullpath = pathDir + File.separator + filename;
+        p.write(fullpath);
+        s.setPhotoPath("/" + localdir + "/" + filename);
 
         studentDAO.save(s);
         response.sendRedirect("/list");
-    }
+	}
 
 
     protected void doGet(javax.servlet.http.HttpServletRequest request, javax.servlet.http.HttpServletResponse response) throws javax.servlet.ServletException, IOException {
